@@ -1,4 +1,4 @@
-import { IActionCall } from "./iactioncall";
+import { IActionCall } from "./iaction-call";
 
 export class ActionCallCreationError extends Error {
     constructor(msg: string) {

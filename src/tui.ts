@@ -2,7 +2,10 @@ import { ITUI } from './itui';
 import { ITerminal } from './iterminal'
 import { IAction } from './iaction';
 import { Action } from './action';
-import { ActionCall } from './actioncall';
+import { ActionCall } from './action-call';
+import { IActionCall } from './iaction-call';
+import { ArgsActionCallsProvider } from './args-action-calls-provider'
+import { IActionCallsProvider } from './iaction-calls-provider';
 
 const exit = "exit"
 const ask = '$ '
@@ -46,22 +49,42 @@ export class TUI implements ITUI {
         await this._terminal.close()
     }
 
-    private async InternalRun(): Promise<void> {
-        const input = await this._terminal.question(ask)
-        if (input.length == 0) return;
+    private async RunActionCall(action: IAction, actionCall: IActionCall) {
+        return await action.callback(...actionCall.args)
+    }
 
-        const actionCall = new ActionCall(input)
+    private async RunActionCallPrintResult(action: IAction, actionCall: IActionCall) {
+        const res = await this.RunActionCall(action, actionCall)
+        if (res) {
+            await this._terminal.write(JSON.stringify(res, null, 2))
+            await this._terminal.write("\r\n")
+        }
+    }
+
+    private async ActionFromActionCall(actionCall: IActionCall): Promise<IAction> {
         const action = this._actions.find((action: IAction) => {
             if (action.command == actionCall.command)
                 return action;
         })
-
         if (!action) throw new TUICommandNotFoundError(actionCall.command)
+        return action;
+    }
 
-        const res = await action.callback(...actionCall.args)
-        if (res) {
-            await this._terminal.write(JSON.stringify(res, null, 2))
-            await this._terminal.write("\r\n")
+    private async RunIteration(actionCall: IActionCall): Promise<void> {
+        try {
+            const action = await this.ActionFromActionCall(actionCall)
+            await this.RunActionCallPrintResult(action, actionCall)
+        } catch (error) {
+            if (error instanceof TUICommandNotFoundError) {
+                await this._terminal.write(error.message)
+                await this._terminal.write("\r\n")
+                await this.Help()
+            }
+            else if (error instanceof TUIError) {
+                await this._terminal.write(error.message)
+                await this._terminal.write("\r\n")
+            }
+            else throw error;
         }
     }
 
@@ -74,20 +97,16 @@ export class TUI implements ITUI {
 
     public async Run(): Promise<void> {
         while (!this._stopRequested) {
-            try {
-                await this.InternalRun()
-            } catch (error) {
-                if (error instanceof TUICommandNotFoundError) {
-                    await this._terminal.write(error.message)
-                    await this._terminal.write("\r\n")
-                    await this.Help()
-                }
-                else if (error instanceof TUIError) {
-                    await this._terminal.write(error.message)
-                    await this._terminal.write("\r\n")
-                }
-                else throw error;
-            }
+            const input = await this._terminal.question(ask)
+            if (input.length == 0) continue;
+            const actionCall = new ActionCall(input)
+            await this.RunIteration(actionCall)
+        }
+    }
+
+    public async RunActionCalls(actionCallsProvider: IActionCallsProvider): Promise<void> {
+        for (const actionCall of actionCallsProvider.actioncalls) {
+            await this.RunIteration(actionCall)
         }
     }
 }
