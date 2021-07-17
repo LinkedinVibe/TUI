@@ -4,7 +4,6 @@ import { IAction } from './iaction';
 import { Action } from './action';
 import { ActionCall } from './action-call';
 import { IActionCall } from './iaction-call';
-import { ArgsActionCallsProvider } from './args-action-calls-provider'
 import { IActionCallsProvider } from './iaction-calls-provider';
 
 const exit = "exit"
@@ -24,16 +23,19 @@ export class TUICommandNotFoundError extends TUIError {
     }
 }
 
+export type Actions = Array<Action>;
+export type PartialActions = Array<Partial<Action>>
+
 export class TUI implements ITUI {
     private _stopRequested = false;
-    private _actions: Array<IAction>;
+    private _actions: Actions;
     private _terminal: ITerminal;
     private _userExitAction?: IAction;
 
-    constructor(terminal: ITerminal, actions: Array<Partial<Action>>) {
+    constructor(terminal: ITerminal, partialActions: PartialActions) {
         this._terminal = terminal
-        this._actions = actions.map(partialAction => new Action(partialAction))
-        const _userExitAction = actions.find((action) => {
+        this._actions = partialActions.map(partialAction => new Action(partialAction))
+        const _userExitAction = partialActions.find((action) => {
             if (action.command == exit) return action
         })
         this._actions.push(new Action({
@@ -109,4 +111,5 @@ export class TUI implements ITUI {
             await this.RunIteration(actionCall)
         }
     }
+
 }
