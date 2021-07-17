@@ -1,6 +1,6 @@
 {
   "name": "@zzck.dev/tui",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TS TUI",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -20,7 +20,11 @@
     "tui",
     "console",
     "terminal",
-    "interface"
+    "interface",
+    "argsparser",
+    "commandline",
+    "commandline-args-parser",
+    "parser"
   ],
   "author": "Zakhar Bozhok",
   "license": "ISC",
