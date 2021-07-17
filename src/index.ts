@@ -1,7 +1,9 @@
 import { ITUI } from "./itui";
-import { PartialActions, TUI, TUICommandNotFoundError, TUIError } from "./tui";
+import { TUI, PartialActions,  TUICommandNotFoundError, TUIError } from "./tui";
+
 import { IAction } from "./iaction";
 import { Action, ActionFromPartialError, InvalidParameterError } from "./action";
+
 import { ITerminal } from "./iterminal";
 import { Terminal } from "./terminal";
 
@@ -26,5 +28,7 @@ export {
     InvalidParameterError,
     ITerminal,
     Terminal,
+    IActionCallsProvider,
+    ArgsActionCallsProvider,
     HandleArgs
 }
