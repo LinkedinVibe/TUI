@@ -7,12 +7,9 @@
   "directories": {
     "lib": "lib"
   },
-  "devDependencies": {
-    "rimraf": "^3.0.2",
-    "typescript": "^4.3.5"
-  },
   "scripts": {
     "build": "rimraf ./lib && tsc",
+    "lint" : "eslint ./src --ext .ts",
     "pub": "npm run build && npm publish --access public"
   },
   "repository": {
@@ -30,5 +27,15 @@
   "bugs": {
     "url": "https://github.com/LinkedinVibe/TUI/issues"
   },
-  "homepage": "https://github.com/LinkedinVibe/TUI#readme"
+  "homepage": "https://github.com/LinkedinVibe/TUI#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^16.3.2",
+    "@typescript-eslint/eslint-plugin": "^4.28.3",
+    "@typescript-eslint/parser": "^4.28.3",
+    "eslint": "^7.30.0",
+    "rimraf": "^3.0.2",
+    "typescript": "^4.3.5",
+    "undefined": "^0.1.0"
+  }
 }
